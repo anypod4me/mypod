@@ -1,0 +1,84 @@
+const $ = s => document.querySelector(s);
+const state = { imageId: null, freeLimit: 3, stripePk: null };
+
+(async function boot(){
+  const cfg = await fetch('/config.json').then(r=>r.json());
+  state.freeLimit = cfg.freeLimit;
+  state.stripePk = cfg.stripePk;
+  const fn = document.getElementById('freeNotice');
+  if (fn) fn.textContent = `You have ${state.freeLimit} free HD generations. Then subscribe or buy credits.`;
+
+  const prod = await fetch('/api/dtg-products').then(r=>r.json()).catch(()=>({products:[]}));
+  const sel = $('#product');
+  if (sel) {
+    sel.innerHTML = '';
+    (prod.products||[]).forEach(p=>{
+      const o = document.createElement('option');
+      o.value = p.id; o.textContent = `${p.name} (#${p.id})`;
+      sel.appendChild(o);
+    });
+  }
+})();
+
+async function track(event, data={}) {
+  try { if (window.gtag) gtag('event', event, data); if (window.fbq) fbq('trackCustom', event, data); } catch {}
+}
+
+$('#genBtn')?.addEventListener('click', async ()=>{
+  const prompt = $('#prompt').value.trim();
+  $('#genMsg').textContent = 'Generating (HD) …';
+  try {
+    const r = await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error||'Failed');
+    state.imageId = j.id;
+    $('#preview').src = j.url;
+    $('#previewWrap').classList.remove('hidden');
+    $('#genMsg').textContent = 'Looks good? Optionally add text below.';
+    track('GenerateImageSuccess');
+  } catch(e){
+    $('#genMsg').textContent = e.message;
+    track('GenerateImageError', {message: e.message});
+  }
+});
+
+$('#overlayBtn')?.addEventListener('click', async ()=>{
+  if (!state.imageId) return;
+  const text = $('#overlayText').value;
+  const color = $('#overlayColor').value;
+  const size = Number($('#overlaySize').value||160);
+  const r = await fetch('/api/overlay',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:state.imageId,text,color,size})});
+  const j = await r.json();
+  if (j.url) { $('#preview').src = j.url + `?t=${Date.now()}`; track('OverlayApplied'); }
+});
+
+$('#orderBtn')?.addEventListener('click', async ()=>{
+  if (!state.imageId) { alert('Generate an image first'); return; }
+  const body = {
+    id: state.imageId,
+    product_id: $('#product').value,
+    size: $('#size').value,
+    color: $('#color').value,
+    quantity: 1,
+    recipient: {
+      name: $('#name').value,
+      address1: $('#address1').value,
+      city: $('#city').value,
+      state_code: $('#state').value,
+      country_code: $('#country').value || 'US',
+      zip: $('#zip').value
+    }
+  };
+  $('#orderMsg').textContent = 'Placing order…';
+  const r = await fetch('/api/order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const j = await r.json();
+  if (!r.ok) { $('#orderMsg').textContent = j.error||'Order failed'; track('OrderError', {message: j.error}); return; }
+  $('#orderMsg').textContent = 'Order submitted! Printful will handle USPS shipping.';
+  track('OrderSubmitted');
+});
+
+$('#buyBtn')?.addEventListener('click', async ()=>{
+  const r = await fetch('/api/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ mode: 'subscription', quantity: 1 })});
+  const j = await r.json();
+  if (j.url) { track('CheckoutStart'); window.location = j.url; } else { alert(j.error||'Checkout failed'); track('CheckoutError', {message: j.error}); }
+});
