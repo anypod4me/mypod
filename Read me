@@ -1,0 +1,17 @@
+# AnyPOD4Me — Marketing-Polished Build
+
+- Landing hero with clear CTAs, promo banner, examples, pricing
+- DTG-only tees, square 4500×4500 upscale, no-words prompts, optional text overlay
+- 3-free images → Stripe Checkout
+- Google Analytics + Meta Pixel (env-driven)
+
+## Setup
+1) Copy `.env.example` → `.env` and fill keys.
+2) `npm install`
+3) `npm start`
+4) Visit http://localhost:3000
+
+## Deploy (Render)
+- Build: `npm install`
+- Start: `node server.js`
+- Add env vars → Deploy
