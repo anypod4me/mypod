@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AnyPOD4Me — Design a DTG Tee in 1-2-3</title>
+  <meta name="description" content="Generate AI artwork, add optional text, preview a DTG tee mockup, and order with fast USPS shipping. First 3 designs free." />
+  <link rel="stylesheet" href="/styles.css" />
+  <script>
+    fetch('/config.json').then(r=>r.json()).then(cfg=>{
+      if (cfg.gaId) {
+        const s = document.createElement('script');
+        s.async = true; s.src = `https://www.googletagmanager.com/gtag/js?id=${cfg.gaId}`;
+        document.head.appendChild(s);
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);} window.gtag = gtag;
+        gtag('js', new Date()); gtag('config', cfg.gaId);
+      }
+      if (cfg.metaPixelId) {
+        !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+        n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', cfg.metaPixelId); fbq('track', 'PageView');
+      }
+    });
+  </script>
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=META_PIXEL_ID&ev=PageView&noscript=1"/></noscript>
+</head>
+<body>
+  <div class="promo">🔥 First 100 orders: <b>Free USPS shipping</b> — use code: FIRST100</div>
+  <header class="hero">
+    <h1>Create Your Dream Tee in 1-2-3</h1>
+    <p>AI-generated art → Optional text overlay → DTG printing on premium tees. First <b>3 designs free</b>.</p>
+    <div class="cta-row">
+      <a href="#generator" class="btn primary">Create My Shirt Now</a>
+      <a href="#how" class="btn outline">See How It Works</a>
+    </div>
+    <div class="trust"><span>DTG Quality</span> • <span>USPS Shipping</span> • <span>Cancel Anytime</span></div>
+  </header>
+
+  <main>
+    <section id="socialproof" class="card examples">
+      <h2>Trending examples</h2>
+      <div class="examples-grid"><div class="ex ex1"></div><div class="ex ex2"></div><div class="ex ex3"></div><div class="ex ex4"></div></div>
+    </section>
+
+    <section id="generator" class="card">
+      <h2>1) Generate your art (no words)</h2>
+      <div class="row">
+        <input id="prompt" placeholder="Describe your artwork (no text)…">
+        <button id="genBtn" class="btn primary">Generate (HD)</button>
+      </div>
+      <p id="genMsg" class="muted"></p>
+      <div id="previewWrap" class="preview hidden">
+        <img id="preview" alt="preview" />
+        <div class="row">
+          <input id="overlayText" placeholder="Optional overlay text…">
+          <input id="overlayColor" type="color" value="#000000">
+          <input id="overlaySize" type="number" min="40" max="400" value="160">
+          <button id="overlayBtn" class="btn">Add Text</button>
+        </div>
+      </div>
+      <div id="freeNotice" class="muted"></div>
+    </section>
+
+    <section id="how" class="card steps">
+      <h2>2) Choose your DTG tee</h2>
+      <div class="row">
+        <select id="product"></select>
+        <select id="size"><option>S</option><option>M</option><option>L</option><option>XL</option><option>2XL</option></select>
+        <input id="color" placeholder="color (e.g. black)" value="black">
+      </div>
+      <p class="muted">We only list DTG tees with square print areas so your art stays crisp edge-to-edge.</p>
+    </section>
+
+    <section class="card">
+      <h2>3) Ship it</h2>
+      <div class="grid">
+        <input id="name" placeholder="Full name">
+        <input id="address1" placeholder="Address line 1">
+        <input id="city" placeholder="City">
+        <input id="state" placeholder="State">
+        <input id="zip" placeholder="ZIP">
+        <input id="country" placeholder="Country" value="US">
+      </div>
+      <div class="row">
+        <button id="orderBtn" class="btn primary">Place Order</button>
+        <button id="buyBtn" class="btn outline">Upgrade / Buy Credits</button>
+      </div>
+      <p id="orderMsg" class="muted"></p>
+    </section>
+
+    <section class="card pricing">
+      <h2>Simple pricing</h2>
+      <ul>
+        <li><b>First 3 designs free</b></li>
+        <li><b>Subscription</b> for unlimited designs — cancel anytime</li>
+        <li><b>Pay-as-you-go credits</b> available</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer><div>© <span id="year"></span> AnyPOD4Me • Premium DTG Printing • USPS Shipping</div></footer>
+  <script src="/app.js"></script>
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
